@@ -1,0 +1,57 @@
+def Graphs(data,cols="default",directory=os.getcwd(),cat="default"):
+    os.chdir(directory)
+    if cols == "default":
+        cols = data.columns
+    else:
+        cols = cols
+    if cat != "default":
+        for i in cat:
+            sns.countplot(data[i], color = "lightcyan",edgecolor="black").set_title("Bar Plot of "+i)
+            sns.set_style("darkgrid")
+            a=i+".jpeg"
+            plt.savefig(a)
+            plt.show()
+            cols = cols.drop([i])
+    for i in cols:
+        if data[i].dtypes == object:
+            sns.countplot(data[i], color = "lightcyan",edgecolor="black").set_title("Bar Plot of "+i)
+            sns.set_style("darkgrid")
+            a=i+".jpeg"
+            plt.savefig(a)
+            plt.show()
+        else:
+            f, (ax_box, ax_hist) = plt.subplots(2,sharex=True, gridspec_kw={"height_ratios": (1,5)},figsize=(10,7))
+            mean=data[i].mean()
+            median=data[i].median()
+            mode=data[i].mode().values[0]
+            sns.boxplot(data[i], ax=ax_box, color = "honeydew").set_title("Boxplot of "+i)
+            ax_box.axvline(mean, color="r", linestyle="--")
+            ax_box.axvline(median, color="g", linestyle="-.")
+            ax_box.axvline(mode, color="b", linestyle=":")
+            sns.histplot(data[i], ax=ax_hist, color = "lightcyan",edgecolor="black").set_title("Histogram of "+i)
+            ax_hist.axvline(mean, color="r", linestyle="--", label="Mean")
+            ax_hist.axvline(median, color="g", linestyle="-.", label="Median")
+            ax_hist.axvline(mode, color="b", linestyle=":", label="Mode")
+            ax_hist.legend()
+            a=i+".jpeg"
+            plt.savefig(a)
+            plt.show()
+    l=[]
+    for i in data:
+        l.append(i)
+    for i in l:        
+        l.remove(i)
+        for j in l:
+            if data[i].dtypes != object and data[j].dtypes != object:
+                if data[i].corr(data[j]) > 0.7:
+                    print("positive = "+i,j)
+                    sns.jointplot(x = data[i], y = data[j], kind = "scatter")
+                    a="Strong Positive correlation of "+i+" and "+j+".jpeg"
+                    plt.savefig(a)
+                    plt.show()
+                if data[i].corr(data[j]) < -0.7:
+                    print("negative = "+i,j)
+                    sns.jointplot(x = data[i], y = data[j], kind = "scatter")
+                    a="Strong Negative correlation of "+i+" and "+j+".jpeg"
+                    plt.savefig(a)
+                    plt.show()
